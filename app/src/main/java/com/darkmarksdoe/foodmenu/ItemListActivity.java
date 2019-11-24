@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -192,12 +193,20 @@ public class ItemListActivity extends AppCompatActivity {
 
         @SuppressLint("SetTextI18n")
         @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
+        public void onBindViewHolder(final ViewHolder holder, final int position) {
             try {
                 holder.id.setText("$"+mValues.get(position).getPrice());
                 holder.name.setText(mValues.get(position).getName());
                 holder.itemView.setTag(mValues.get(position));
                 holder.itemView.setOnClickListener(mOnClickListener);
+                holder.btnDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference reference = database.getReference(PATH_FOOD);
+                        reference.child(mValues.get(position).getId()).removeValue();
+                    }
+                });
             }catch (Exception e){
                 Toast.makeText(mParentActivity, e.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -212,11 +221,13 @@ public class ItemListActivity extends AppCompatActivity {
         class ViewHolder extends RecyclerView.ViewHolder {
             final TextView id;
             final TextView name;
+            final ImageButton btnDelete;
 
             ViewHolder(View view) {
                 super(view);
                 id = view.findViewById(R.id.id_text);
                 name = view.findViewById(R.id.etName);
+                btnDelete = view.findViewById(R.id.btnDelete);
             }
         }
     }
